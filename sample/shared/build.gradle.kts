@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.arttttt.nav3router"
+        namespace = "com.arttttt.nav3router.sample.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
 
         packaging {
@@ -39,6 +39,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.navigation3.ui)
         }
         commonMain.dependencies {
             implementation(project(":nav3-router"))
@@ -51,6 +52,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.navigation3.runtime)
         }
     }
 }
