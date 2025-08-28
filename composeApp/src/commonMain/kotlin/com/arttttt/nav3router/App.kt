@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-import nav3router.composeapp.generated.resources.Res
-import nav3router.composeapp.generated.resources.compose_multiplatform
+import navigation3router.composeapp.generated.resources.Res
+import navigation3router.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview

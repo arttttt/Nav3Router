@@ -1,4 +1,3 @@
-rootProject.name = "Nav3Router"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -28,4 +27,7 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp")
+rootProject.name = "Navigation3Router"
+include(":sample:android")
+include(":sample:shared")
+include(":nav3-router")
