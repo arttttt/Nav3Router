@@ -41,6 +41,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            implementation(project(":nav3-router"))
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
