@@ -1,21 +1,25 @@
 package com.arttttt.nav3router.sample.shared
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.entry
+import androidx.navigation3.runtime.entryProvider
+import com.arttttt.nav3router.Nav3Host
 
 @Composable
 fun RootContent() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
+    Nav3Host<Screen>(
+        backStack = rememberNavBackStack(Screen.Main)
+    ) { backStack, onBack, router ->
+        NavDisplay(
+            modifier = Modifier,
+            backStack = backStack,
+            onBack = onBack,
+            entryProvider = entryProvider {
+                entry<Screen.Main> {
 
-        Text(
-            text = "hello from shared code"
+                }
+            },
         )
     }
 }
