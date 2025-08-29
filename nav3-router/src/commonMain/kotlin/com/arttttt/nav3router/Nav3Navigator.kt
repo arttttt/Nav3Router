@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.NavKey
 // TODO: do not mutate a whole list for each command
 class Nav3Navigator(
     private val navBackStack: SnapshotStateList<NavKey>,
+    private val onBack: () -> Unit,
 ) : Navigator {
 
     override fun applyCommands(
@@ -75,6 +76,10 @@ class Nav3Navigator(
     private fun back() {
         if (navBackStack.isEmpty()) return
 
-        navBackStack.removeLastOrNull()
+        if (navBackStack.size > 1) {
+            navBackStack.removeLastOrNull()
+        } else {
+            onBack()
+        }
     }
 }
