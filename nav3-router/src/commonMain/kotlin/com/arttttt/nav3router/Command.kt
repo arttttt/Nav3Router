@@ -2,10 +2,7 @@ package com.arttttt.nav3router
 
 interface Command
 
-data class Forward<T : Any>(val screen: T) : Command
-
-data class Replace<T : Any>(val screen: T) : Command
-
-data object Back : Command
-
-data class BackTo<T : Any>(val screen: T?) : Command
+data class Push<T : Any>(val screen: T) : Command
+data class ReplaceCurrent<T : Any>(val screen: T) : Command
+data object Pop : Command
+data class PopTo<T : Any>(val screen: T?) : Command

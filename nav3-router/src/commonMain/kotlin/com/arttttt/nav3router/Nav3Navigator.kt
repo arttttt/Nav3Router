@@ -3,6 +3,7 @@ package com.arttttt.nav3router
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation3.runtime.NavKey
 
+// TODO: do not mutate a whole list for each command
 class Nav3Navigator(
     private val navBackStack: SnapshotStateList<NavKey>,
 ) : Navigator {
@@ -21,20 +22,20 @@ class Nav3Navigator(
 
     private fun applyCommand(command: Command) {
         when (command) {
-            is Forward<*> -> forward(command)
-            is Replace<*> -> replace(command)
-            is BackTo<*> -> backTo(command)
-            is Back -> back()
+            is Push<*> -> forward(command)
+            is ReplaceCurrent<*> -> replace(command)
+            is PopTo<*> -> backTo(command)
+            is Pop -> back()
         }
     }
 
-    private fun forward(command: Forward<*>) {
+    private fun forward(command: Push<*>) {
         if (command.screen !is NavKey) error("Screen must be NavKey")
 
         navBackStack += command.screen
     }
 
-    private fun replace(command: Replace<*>) {
+    private fun replace(command: ReplaceCurrent<*>) {
         if (command.screen !is NavKey) error("Screen must be NavKey")
 
         if (navBackStack.isEmpty()) {
@@ -47,7 +48,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun backTo(command: BackTo<*>) {
+    private fun backTo(command: PopTo<*>) {
         val target = command.screen
         if (target == null) {
             if (navBackStack.size > 1) {
@@ -74,6 +75,6 @@ class Nav3Navigator(
     private fun back() {
         if (navBackStack.isEmpty()) return
 
-        navBackStack.removeAt(navBackStack.indices.last)
+        navBackStack.removeLastOrNull()
     }
 }

@@ -7,5 +7,7 @@ import kotlinx.serialization.Serializable
 sealed interface Screen : NavKey {
 
     @Serializable
-    data object Main : Screen
+    data class Main(
+        val index: Int,
+    ) : Screen
 }

@@ -4,49 +4,50 @@ class Router<in T : Any> {
 
     internal val commandQueue = CommandQueue()
 
-    fun navigateTo(screen: T) {
-        executeCommands(Forward(screen))
-    }
+    fun push(vararg screens: T) {
+        if (screens.isEmpty()) error("Screens must not be empty")
 
-    fun newRootScreen(screen: T) {
         executeCommands(
-            BackTo(null),
-            Replace(screen)
+            *screens
+                .map { screen -> Push(screen) }
+                .toTypedArray()
         )
     }
 
-    fun replaceScreen(screen: T) {
-        executeCommands(Replace(screen))
+    fun replaceCurrent(screen: T) {
+        executeCommands(ReplaceCurrent(screen))
     }
 
-    fun backTo(screen: T?) {
-        executeCommands(BackTo(screen))
+    fun popUpTo(screen: T?) {
+        executeCommands(PopTo(screen))
     }
 
-    fun newChain(vararg screens: T) {
-        val commands = screens.map { Forward(it) }
-        executeCommands(*commands.toTypedArray())
-    }
+    fun replaceStack(vararg screens: T) {
+        if (screens.isEmpty()) error("Screens must not be empty")
 
-    fun newRootChain(vararg screens: T) {
-        val commands = screens.mapIndexed { index, screen ->
-            if (index == 0)
-                Replace(screen)
-            else
-                Forward(screen)
-        }
-        executeCommands(BackTo(null), *commands.toTypedArray())
-    }
-
-    fun finishChain() {
         executeCommands(
-            BackTo(null),
-            Back
+            PopTo<T>(null),
+            *screens
+                .mapIndexed { index, screen ->
+                    if (index == 0) {
+                        ReplaceCurrent(screen)
+                    } else {
+                        Push(screen)
+                    }
+                }
+                .toTypedArray()
         )
     }
 
-    fun back() {
-        executeCommands(Back)
+    fun clearStack() {
+        executeCommands(
+            PopTo<T>(null),
+            Pop,
+        )
+    }
+
+    fun popUp() {
+        executeCommands(Pop)
     }
 
     private fun executeCommands(vararg commands: Command) {

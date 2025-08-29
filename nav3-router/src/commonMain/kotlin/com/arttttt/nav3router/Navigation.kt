@@ -33,7 +33,9 @@ fun rememberNav3Navigator(
 fun <T : Any> Nav3Host(
     backStack: SnapshotStateList<NavKey>,
     router: Router<T> = rememberRouter(),
-    navigator: Navigator = rememberNav3Navigator(backStack),
+    navigator: Navigator = rememberNav3Navigator(
+        backStack = backStack,
+    ),
     content: @Composable (
         backStack: SnapshotStateList<NavKey>,
         onBack: (Int) -> Unit,
@@ -46,7 +48,7 @@ fun <T : Any> Nav3Host(
     }
 
     val onBack: (Int) -> Unit = remember(router) {
-        { steps -> repeat(steps) { router.back() } }
+        { steps -> repeat(steps) { router.popUp() } }
     }
 
     content(backStack, onBack, router)
