@@ -1,9 +1,9 @@
 package com.arttttt.nav3router
 
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation3.runtime.NavKey
 
-// TODO: do not mutate a whole list for each command
 class Nav3Navigator(
     private val navBackStack: SnapshotStateList<NavKey>,
     private val onBack: () -> Unit,
@@ -12,69 +12,114 @@ class Nav3Navigator(
     override fun applyCommands(
         commands: Array<out Command<NavKey>>,
     ) {
+        val snapshot = navBackStack.toMutableList()
+
         for (command in commands) {
             try {
-                applyCommand(command)
+                applyCommand(
+                    snapshot = snapshot,
+                    command = command,
+                )
             } catch (e: RuntimeException) {
                 // TODO: handle exceptions
             }
         }
+
+        navBackStack.swap(snapshot)
     }
 
-    private fun applyCommand(command: Command<NavKey>) {
+    private fun applyCommand(
+        snapshot: MutableList<NavKey>,
+        command: Command<NavKey>,
+    ) {
         when (command) {
-            is Push<NavKey> -> forward(command)
-            is ReplaceCurrent<NavKey> -> replace(command)
-            is PopTo<NavKey> -> backTo(command)
-            is Pop -> back()
+            is Push<NavKey> -> forward(
+                snapshot = snapshot,
+                command = command,
+            )
+            is ReplaceCurrent<NavKey> -> replace(
+                snapshot = snapshot,
+                command = command,
+            )
+            is PopTo<NavKey> -> backTo(
+                snapshot = snapshot,
+                command = command,
+            )
+            is Pop -> back(
+                snapshot = snapshot,
+            )
         }
     }
 
-    private fun forward(command: Push<NavKey>) {
-        navBackStack += command.screen
+    private fun forward(
+        snapshot: MutableList<NavKey>,
+        command: Push<NavKey>,
+    ) {
+        snapshot += command.screen
     }
 
-    private fun replace(command: ReplaceCurrent<NavKey>) {
-        if (navBackStack.isEmpty()) {
-            navBackStack += command.screen
+    private fun replace(
+        snapshot: MutableList<NavKey>,
+        command: ReplaceCurrent<NavKey>,
+    ) {
+        if (snapshot.isEmpty()) {
+            snapshot += command.screen
         } else {
-            navBackStack.set(
-                index = navBackStack.indices.last,
+            snapshot.set(
+                index = snapshot.indices.last,
                 element = command.screen,
             )
         }
     }
 
-    private fun backTo(command: PopTo<NavKey>) {
+    private fun backTo(
+        snapshot: MutableList<NavKey>,
+        command: PopTo<NavKey>,
+    ) {
         val target = command.screen
         if (target == null) {
-            if (navBackStack.size > 1) {
-                navBackStack.removeRange(1, navBackStack.size)
+            if (snapshot.size > 1) {
+                snapshot.removeRange(1, snapshot.size)
             }
             return
         }
 
-        val idx = navBackStack.indexOfFirst { it == command.screen }
+        val idx = snapshot.indexOfFirst { it == command.screen }
 
         if (idx == -1) {
-            if (navBackStack.size > 1) {
-                navBackStack.removeRange(1, navBackStack.size)
+            if (snapshot.size > 1) {
+                snapshot.removeRange(1, snapshot.size)
             }
         } else {
             val from = idx + 1
-            if (from < navBackStack.size) {
-                navBackStack.removeRange(from, navBackStack.size)
+            if (from < snapshot.size) {
+                snapshot.removeRange(from, snapshot.size)
             }
         }
     }
 
-    private fun back() {
-        if (navBackStack.isEmpty()) return
+    private fun back(
+        snapshot: MutableList<NavKey>,
+    ) {
+        if (snapshot.isEmpty()) return
 
-        if (navBackStack.size > 1) {
-            navBackStack.removeLastOrNull()
+        if (snapshot.size > 1) {
+            snapshot.removeLastOrNull()
         } else {
             onBack()
         }
+    }
+
+    private fun SnapshotStateList<NavKey>.swap(
+        value: List<NavKey>,
+    ) {
+        Snapshot.withMutableSnapshot {
+            clear()
+            addAll(value)
+        }
+    }
+
+    private fun MutableList<NavKey>.removeRange(fromIndex: Int, toIndex: Int) {
+        subList(fromIndex, toIndex).clear()
     }
 }
