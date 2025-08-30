@@ -33,6 +33,10 @@ class Router<T : Any> {
     }
 
     fun clearStack() {
+        executeCommands(ResetToRoot)
+    }
+
+    fun dropStack() {
         executeCommands(
             ResetToRoot,
             Pop,
