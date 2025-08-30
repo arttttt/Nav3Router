@@ -12,8 +12,11 @@ class CommandQueue<T : Any> : NavigatorHolder<T> {
 
     override fun setNavigator(navigator: Navigator<T>) {
         this.navigator = navigator
-        pendingCommands.forEach { navigator.applyCommands(it) }
-        pendingCommands.clear()
+        if (pendingCommands.isNotEmpty()) {
+            val snapshot = pendingCommands.toList()
+            pendingCommands.clear()
+            snapshot.forEach { navigator.applyCommands(it) }
+        }
     }
 
     override fun removeNavigator() {
