@@ -33,7 +33,7 @@ class Nav3Navigator(
         command: Command<NavKey>,
     ) {
         when (command) {
-            is Push<NavKey> -> forward(
+            is Push<NavKey> -> push(
                 snapshot = snapshot,
                 command = command,
             )
@@ -41,11 +41,11 @@ class Nav3Navigator(
                 snapshot = snapshot,
                 command = command,
             )
-            is PopTo<NavKey> -> backTo(
+            is PopTo<NavKey> -> popTo(
                 snapshot = snapshot,
                 command = command,
             )
-            is Pop -> back(
+            is Pop -> pop(
                 snapshot = snapshot,
             )
             is ResetToRoot -> resetToRoot(
@@ -54,7 +54,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun forward(
+    private fun push(
         snapshot: MutableList<NavKey>,
         command: Push<NavKey>,
     ) {
@@ -75,7 +75,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun backTo(
+    private fun popTo(
         snapshot: MutableList<NavKey>,
         command: PopTo<NavKey>,
     ) {
@@ -94,7 +94,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun back(
+    private fun pop(
         snapshot: MutableList<NavKey>,
     ) {
         if (snapshot.isEmpty()) return
