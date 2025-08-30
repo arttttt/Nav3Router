@@ -3,11 +3,18 @@ package com.arttttt.nav3router
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 
 class Nav3Navigator(
     private val navBackStack: SnapshotStateList<NavKey>,
     private val onBack: () -> Unit,
 ) : Navigator<NavKey> {
+
+    private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun applyCommands(
         commands: Array<out Command<NavKey>>,
@@ -19,6 +26,12 @@ class Nav3Navigator(
                 applyCommand(
                     snapshot = snapshot,
                     command = command,
+                    onBackRequested = {
+                        mainScope.launch {
+                            yield()
+                            onBack()
+                        }
+                    },
                 )
             } catch (e: RuntimeException) {
                 // TODO: handle exceptions
@@ -31,6 +44,7 @@ class Nav3Navigator(
     private fun applyCommand(
         snapshot: MutableList<NavKey>,
         command: Command<NavKey>,
+        onBackRequested: () -> Unit,
     ) {
         when (command) {
             is Push<NavKey> -> push(
@@ -45,9 +59,9 @@ class Nav3Navigator(
                 snapshot = snapshot,
                 command = command,
             )
-            is Pop -> pop(
-                snapshot = snapshot,
-            )
+            is Pop -> {
+                if (!pop(snapshot)) onBackRequested()
+            }
             is ResetToRoot -> resetToRoot(
                 snapshot = snapshot,
             )
@@ -96,14 +110,16 @@ class Nav3Navigator(
 
     private fun pop(
         snapshot: MutableList<NavKey>,
-    ) {
-        if (snapshot.isEmpty()) return
+    ): Boolean {
+        if (snapshot.isEmpty()) return true
 
-        if (snapshot.size > 1) {
+        val result = snapshot.size > 1
+
+        if (result) {
             snapshot.removeLastOrNull()
-        } else {
-            onBack()
         }
+
+        return result
     }
 
     private fun resetToRoot(snapshot: MutableList<NavKey>) {

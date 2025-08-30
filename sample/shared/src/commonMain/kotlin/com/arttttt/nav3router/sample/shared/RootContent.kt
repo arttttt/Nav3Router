@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +30,7 @@ import androidx.navigation3.runtime.entryProvider
 import com.arttttt.nav3router.Nav3Host
 import com.arttttt.nav3router.rememberRouter
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RootContent() {
 
@@ -81,7 +83,10 @@ fun RootContent() {
                     .weight(1f)
                     .border(2.dp, Color.Red),
                 backStack = backStack,
-                onBack = onBack,
+                onBack = {
+                    index--
+                    onBack(it)
+                },
                 entryProvider = entryProvider {
                     entry<Screen.Simple> { screen ->
                         SimpleScreen(
@@ -116,6 +121,9 @@ fun RootContent() {
             onClearStack = {
                 router.clearStack()
             },
+            onDropStack = {
+                router.dropStack()
+            },
         )
     }
 }
@@ -128,6 +136,7 @@ private fun ButtonsGrid(
     onNewChain: () -> Unit,
     onReplaceStack: () -> Unit,
     onClearStack: () -> Unit,
+    onDropStack: () -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier,
@@ -164,6 +173,11 @@ private fun ButtonsGrid(
         navigationButtonItem(
             text = "clear stack",
             onClick = onClearStack,
+        )
+
+        navigationButtonItem(
+            text = "drop stack",
+            onClick = onDropStack,
         )
     }
 }
