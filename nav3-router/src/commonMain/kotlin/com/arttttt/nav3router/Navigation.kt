@@ -26,15 +26,15 @@ fun <T : Any> rememberRouter(
 fun rememberNav3Navigator(
     backStack: SnapshotStateList<NavKey>,
     onBack: () -> Unit,
-): Navigator {
+): Navigator<NavKey> {
     return remember(backStack, onBack) { Nav3Navigator(backStack, onBack) }
 }
 
 @Composable
-fun <T : Any> Nav3Host(
+fun <T : NavKey> Nav3Host(
     backStack: SnapshotStateList<NavKey>,
     router: Router<T> = rememberRouter(),
-    navigator: Navigator = rememberNav3Navigator(
+    navigator: Navigator<T> = rememberNav3Navigator(
         backStack = backStack,
         onBack = platformOnBack(),
     ),

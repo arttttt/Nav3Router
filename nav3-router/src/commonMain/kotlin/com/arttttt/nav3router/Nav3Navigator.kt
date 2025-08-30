@@ -7,10 +7,10 @@ import androidx.navigation3.runtime.NavKey
 class Nav3Navigator(
     private val navBackStack: SnapshotStateList<NavKey>,
     private val onBack: () -> Unit,
-) : Navigator {
+) : Navigator<NavKey> {
 
     override fun applyCommands(
-        commands: Array<out Command>,
+        commands: Array<out Command<NavKey>>,
     ) {
         for (command in commands) {
             try {
@@ -21,24 +21,20 @@ class Nav3Navigator(
         }
     }
 
-    private fun applyCommand(command: Command) {
+    private fun applyCommand(command: Command<NavKey>) {
         when (command) {
-            is Push<*> -> forward(command)
-            is ReplaceCurrent<*> -> replace(command)
-            is PopTo<*> -> backTo(command)
+            is Push<NavKey> -> forward(command)
+            is ReplaceCurrent<NavKey> -> replace(command)
+            is PopTo<NavKey> -> backTo(command)
             is Pop -> back()
         }
     }
 
-    private fun forward(command: Push<*>) {
-        if (command.screen !is NavKey) error("Screen must be NavKey")
-
+    private fun forward(command: Push<NavKey>) {
         navBackStack += command.screen
     }
 
-    private fun replace(command: ReplaceCurrent<*>) {
-        if (command.screen !is NavKey) error("Screen must be NavKey")
-
+    private fun replace(command: ReplaceCurrent<NavKey>) {
         if (navBackStack.isEmpty()) {
             navBackStack += command.screen
         } else {
@@ -49,7 +45,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun backTo(command: PopTo<*>) {
+    private fun backTo(command: PopTo<NavKey>) {
         val target = command.screen
         if (target == null) {
             if (navBackStack.size > 1) {
@@ -58,7 +54,6 @@ class Nav3Navigator(
             return
         }
 
-        if (command.screen !is NavKey) error("Screen must be NavKey")
         val idx = navBackStack.indexOfFirst { it == command.screen }
 
         if (idx == -1) {

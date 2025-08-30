@@ -1,8 +1,8 @@
 package com.arttttt.nav3router
 
-class Router<in T : Any> {
+class Router<T : Any> {
 
-    internal val commandQueue = CommandQueue()
+    internal val commandQueue = CommandQueue<T>()
 
     fun push(vararg screens: T) {
         if (screens.isEmpty()) error("Screens must not be empty")
@@ -50,7 +50,7 @@ class Router<in T : Any> {
         executeCommands(Pop)
     }
 
-    private fun executeCommands(vararg commands: Command) {
+    private fun executeCommands(vararg commands: Command<T>) {
         commandQueue.executeCommands(commands)
     }
 }

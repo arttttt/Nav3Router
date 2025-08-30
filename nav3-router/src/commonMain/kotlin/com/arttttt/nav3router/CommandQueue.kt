@@ -5,12 +5,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class CommandQueue : NavigatorHolder {
-    private var navigator: Navigator? = null
-    private val pendingCommands = mutableListOf<Array<out Command>>()
+class CommandQueue<T : Any> : NavigatorHolder<T> {
+    private var navigator: Navigator<T>? = null
+    private val pendingCommands = mutableListOf<Array<out Command<T>>>()
     private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    override fun setNavigator(navigator: Navigator) {
+    override fun setNavigator(navigator: Navigator<T>) {
         this.navigator = navigator
         pendingCommands.forEach { navigator.applyCommands(it) }
         pendingCommands.clear()
@@ -20,7 +20,7 @@ class CommandQueue : NavigatorHolder {
         navigator = null
     }
 
-    fun executeCommands(commands: Array<out Command>) {
+    fun executeCommands(commands: Array<out Command<T>>) {
         mainScope.launch {
             navigator?.applyCommands(commands) ?: pendingCommands.add(commands)
         }
