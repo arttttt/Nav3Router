@@ -48,6 +48,9 @@ class Nav3Navigator(
             is Pop -> back(
                 snapshot = snapshot,
             )
+            is ResetToRoot -> resetToRoot(
+                snapshot = snapshot,
+            )
         }
     }
 
@@ -77,13 +80,6 @@ class Nav3Navigator(
         command: PopTo<NavKey>,
     ) {
         val target = command.screen
-        if (target == null) {
-            if (snapshot.size > 1) {
-                snapshot.removeRange(1, snapshot.size)
-            }
-            return
-        }
-
         val idx = snapshot.indexOfFirst { it == target }
 
         if (idx == -1) {
@@ -108,6 +104,10 @@ class Nav3Navigator(
         } else {
             onBack()
         }
+    }
+
+    private fun resetToRoot(snapshot: MutableList<NavKey>) {
+        if (snapshot.size > 1) snapshot.removeRange(1, snapshot.size)
     }
 
     private fun SnapshotStateList<NavKey>.swap(
