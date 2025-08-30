@@ -84,7 +84,7 @@ class Nav3Navigator(
             return
         }
 
-        val idx = snapshot.indexOfFirst { it == command.screen }
+        val idx = snapshot.indexOfFirst { it == target }
 
         if (idx == -1) {
             if (snapshot.size > 1) {
