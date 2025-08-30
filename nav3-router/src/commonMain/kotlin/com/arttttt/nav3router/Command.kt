@@ -1,6 +1,6 @@
 package com.arttttt.nav3router
 
-interface Command<out T>
+interface Command<out T : Any>
 
 data class Push<T : Any>(val screen: T) : Command<T>
 data class ReplaceCurrent<T : Any>(val screen: T) : Command<T>
