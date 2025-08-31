@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -28,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import com.arttttt.nav3router.Nav3Host
+import com.arttttt.nav3router.Router
 import com.arttttt.nav3router.rememberRouter
+import com.arttttt.nav3router.sample.shared.navigationButtonItem
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -49,6 +52,37 @@ fun RootContent() {
             }
         }
     }
+
+    val stackManipulationButtons = createStackManipulationButtons(
+        onPop = {
+            router.popUp()
+            index--
+        },
+        onPush = {
+            router.push(Screen.Simple(++index))
+        },
+        onReplace = {
+            router.replaceCurrent(Screen.Simple(++index))
+        },
+        onNewChain = {
+            router.push(
+                Screen.Simple(++index),
+                Screen.Simple(++index),
+                Screen.Simple(++index),
+            )
+        },
+        onReplaceStack = {
+            router.replaceStack(Screen.Simple(++index))
+        },
+        onClearStack = {
+            router.clearStack()
+        },
+        onDropStack = {
+            router.dropStack()
+        },
+    )
+
+    val navigationButtons = createNavigationButtons(router)
 
     Column(
         modifier = Modifier
@@ -83,6 +117,7 @@ fun RootContent() {
                     .weight(1f)
                     .border(2.dp, Color.Red),
                 backStack = backStack,
+                sceneStrategy = DialogSceneStrategy(),
                 onBack = {
                     index--
                     onBack(it)
@@ -93,50 +128,38 @@ fun RootContent() {
                             index = screen.index,
                         )
                     }
+
+                    entry<Screen.BottomSheet> {
+                        BottomSheetScreen()
+                    }
+
+                    entry<Screen.Dialog>(
+                        metadata = DialogSceneStrategy.dialog(),
+                    ) {
+                        DialogScreen(
+                            onClick = {
+                                router.popUp()
+                            },
+                        )
+                    }
                 },
             )
         }
 
-        ButtonsGrid(
-            onPop = {
-                router.popUp()
-                index--
-            },
-            onPush = {
-                router.push(Screen.Simple(++index))
-            },
-            onReplace = {
-                router.replaceCurrent(Screen.Simple(++index))
-            },
-            onNewChain = {
-                router.push(
-                    Screen.Simple(++index),
-                    Screen.Simple(++index),
-                    Screen.Simple(++index),
-                )
-            },
-            onReplaceStack = {
-                router.replaceStack(Screen.Simple(++index))
-            },
-            onClearStack = {
-                router.clearStack()
-            },
-            onDropStack = {
-                router.dropStack()
-            },
-        )
+        ButtonsGrid(stackManipulationButtons)
+        HorizontalDivider()
+        ButtonsGrid(navigationButtons)
     }
 }
 
+private data class ButtonInfo(
+    val title: String,
+    val onClick: () -> Unit,
+)
+
 @Composable
 private fun ButtonsGrid(
-    onPop: () -> Unit,
-    onPush: () -> Unit,
-    onReplace: () -> Unit,
-    onNewChain: () -> Unit,
-    onReplaceStack: () -> Unit,
-    onClearStack: () -> Unit,
-    onDropStack: () -> Unit,
+    buttons: List<ButtonInfo>
 ) {
     LazyVerticalGrid(
         modifier = Modifier,
@@ -145,53 +168,81 @@ private fun ButtonsGrid(
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         contentPadding = PaddingValues(16.dp),
     ) {
-        navigationButtonItem(
-            text = "pop",
-            onClick = onPop,
-        )
-
-        navigationButtonItem(
-            text = "push",
-            onClick = onPush,
-        )
-
-        navigationButtonItem(
-            text = "replace",
-            onClick = onReplace,
-        )
-
-        navigationButtonItem(
-            text = "push 3 screens",
-            onClick = onNewChain,
-        )
-
-        navigationButtonItem(
-            text = "replace stack",
-            onClick = onReplaceStack,
-        )
-
-        navigationButtonItem(
-            text = "clear stack",
-            onClick = onClearStack,
-        )
-
-        navigationButtonItem(
-            text = "drop stack",
-            onClick = onDropStack,
-        )
+        buttons.forEach { button ->
+            navigationButtonItem(button)
+        }
     }
 }
 
+private fun createNavigationButtons(
+    router: Router<Screen>,
+): List<ButtonInfo> {
+    return listOf(
+        ButtonInfo(
+            title = "show bottom sheet",
+            onClick = {
+                router.push(Screen.BottomSheet)
+            },
+        ),
+        ButtonInfo(
+            title = "show dialog",
+            onClick = {
+                router.push(Screen.Dialog)
+            },
+        ),
+    )
+}
+
+private fun createStackManipulationButtons(
+    onPop: () -> Unit,
+    onPush: () -> Unit,
+    onReplace: () -> Unit,
+    onNewChain: () -> Unit,
+    onReplaceStack: () -> Unit,
+    onClearStack: () -> Unit,
+    onDropStack: () -> Unit,
+): List<ButtonInfo> {
+    return listOf(
+        ButtonInfo(
+            title = "pop",
+            onClick = onPop,
+        ),
+        ButtonInfo(
+            title = "push",
+            onClick = onPush,
+        ),
+        ButtonInfo(
+            title = "replace",
+            onClick = onReplace,
+        ),
+        ButtonInfo(
+            title = "push 3 screens",
+            onClick = onNewChain,
+        ),
+        ButtonInfo(
+            title = "replace stack",
+            onClick = onReplaceStack,
+        ),
+        ButtonInfo(
+            title = "clear stack",
+            onClick = onClearStack,
+        ),
+        ButtonInfo(
+            title = "drop stack",
+            onClick = onDropStack,
+        ),
+    )
+}
+
 private fun LazyGridScope.navigationButtonItem(
-    text: String,
-    onClick: () -> Unit,
+    info: ButtonInfo,
 ) {
     item {
         Button(
-            onClick = onClick,
+            onClick = info.onClick,
         ) {
             Text(
-                text = text
+                text = info.title,
             )
         }
     }

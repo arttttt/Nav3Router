@@ -10,4 +10,10 @@ sealed interface Screen : NavKey {
     data class Simple(
         val index: Int,
     ) : Screen
+
+    @Serializable
+    data object BottomSheet : Screen
+
+    @Serializable
+    data object Dialog : Screen
 }
