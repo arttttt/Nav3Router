@@ -1,6 +1,6 @@
 package com.arttttt.nav3router
 
-class Router<T : Any> : BaseRouter<T>() {
+open class Router<T : Any> : BaseRouter<T>() {
 
     fun push(vararg screens: T) {
         if (screens.isEmpty()) error("Screens must not be empty")
