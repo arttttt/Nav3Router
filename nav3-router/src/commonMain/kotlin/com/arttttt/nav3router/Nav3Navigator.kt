@@ -121,8 +121,6 @@ class Nav3Navigator(
     private fun pop(
         snapshot: MutableList<NavKey>,
     ): Boolean {
-        if (snapshot.isEmpty()) return true
-
         val result = snapshot.size > 1
 
         if (result) {
