@@ -16,8 +16,6 @@ class Router<T : Any> {
     }
 
     fun replaceStack(vararg screens: T) {
-        if (screens.isEmpty()) error("Screens must not be empty")
-
         require(screens.isNotEmpty()) { "Screens must not be empty" }
         val commands = buildList {
             add(ResetToRoot)
