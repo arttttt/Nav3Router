@@ -1,4 +1,4 @@
-package com.arttttt.nav3router.sample.shared
+package com.arttttt.nav3router.sample.shared.screens
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -15,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,20 +22,21 @@ import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import com.arttttt.nav3router.Nav3Host
 import com.arttttt.nav3router.rememberRouter
-import com.arttttt.nav3router.sample.shared.screens.BottomSheetScreen
-import com.arttttt.nav3router.sample.shared.screens.DialogScreen
-import com.arttttt.nav3router.sample.shared.screens.NestedContainerScreen
-import com.arttttt.nav3router.sample.shared.screens.SimpleScreen
+import com.arttttt.nav3router.sample.shared.ButtonsGrid
+import com.arttttt.nav3router.sample.shared.DialogSceneStrategy
+import com.arttttt.nav3router.sample.shared.NavDisplay
+import com.arttttt.nav3router.sample.shared.Screen
+import com.arttttt.nav3router.sample.shared.SinglePaneSceneStrategy
+import com.arttttt.nav3router.sample.shared.createStackManipulationButtons
+import com.arttttt.nav3router.sample.shared.dialog
+import com.arttttt.nav3router.sample.shared.rememberNavBackStack
 import com.arttttt.nav3router.sample.shared.strategies.BottomSheetSceneStrategy
 import com.arttttt.nav3router.sample.shared.strategies.DelegatedScreenStrategy
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
-@OptIn(
-    ExperimentalComposeUiApi::class,
-    ExperimentalMaterial3Api::class,
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RootContent() {
-
+fun NestedContainerScreen() {
     var index by remember { mutableIntStateOf(0) }
     val router = rememberRouter<Screen>()
 
@@ -83,8 +82,6 @@ fun RootContent() {
         },
     )
 
-    val navigationButtons = createNavigationButtons(router)
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -115,6 +112,7 @@ fun RootContent() {
         ) { backStack, onBack, router ->
             NavDisplay(
                 modifier = Modifier
+                    .padding(8.dp)
                     .weight(1f)
                     .border(
                         2.dp,
@@ -156,18 +154,16 @@ fun RootContent() {
                             },
                         )
                     }
-
-                    entry<Screen.NestedContainer>(
-                        clazzContentKey = Screen.NestedContainer::key,
-                    ) {
-                        NestedContainerScreen()
-                    }
                 },
             )
         }
 
         ButtonsGrid(stackManipulationButtons)
-        HorizontalDivider()
-        ButtonsGrid(navigationButtons)
     }
+}
+
+@Preview
+@Composable
+private fun NestedContainerScreenContentPreview() {
+    NestedContainerScreen()
 }

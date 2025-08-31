@@ -1,7 +1,9 @@
-package com.arttttt.nav3router.sample.shared
+package com.arttttt.nav3router.sample.shared.strategies
 
 import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavEntry
+import com.arttttt.nav3router.sample.shared.Scene
+import com.arttttt.nav3router.sample.shared.SceneStrategy
 
 class DelegatedScreenStrategy<T : Any>(
     private val strategyMap: Map<String, SceneStrategy<T>>,

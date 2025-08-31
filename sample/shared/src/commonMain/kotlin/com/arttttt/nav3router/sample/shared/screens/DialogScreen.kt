@@ -1,4 +1,4 @@
-package com.arttttt.nav3router.sample.shared
+package com.arttttt.nav3router.sample.shared.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
