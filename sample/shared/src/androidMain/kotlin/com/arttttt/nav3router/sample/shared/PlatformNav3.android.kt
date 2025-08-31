@@ -32,3 +32,7 @@ actual typealias SceneStrategy<T> = androidx.navigation3.ui.SceneStrategy<T>
 actual typealias SinglePaneSceneStrategy<T> = androidx.navigation3.ui.SinglePaneSceneStrategy<T>
 
 actual typealias DialogSceneStrategy<T> = androidx.navigation3.ui.DialogSceneStrategy<T>
+
+actual typealias Scene<T> = androidx.navigation3.ui.Scene<T>
+
+actual typealias OverlayScene<T> = androidx.navigation3.ui.OverlayScene<T>

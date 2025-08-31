@@ -33,19 +33,55 @@ expect inline fun <reified T : NavKey> rememberNavBackStack(vararg elements: T):
 /**
  * Remove when [androidx.navigation3:navigation3-ui] will become multiplatform
  */
-expect interface SceneStrategy<T : Any>
+expect interface SceneStrategy<T : Any> {
+
+    @Composable
+    fun calculateScene(entries: List<NavEntry<T>>, onBack: (count: Int) -> Unit): Scene<T>?
+}
 
 /**
  * Remove when [androidx.navigation3:navigation3-ui] will become multiplatform
  */
-expect class SinglePaneSceneStrategy<T : Any>() : SceneStrategy<T>
+expect class SinglePaneSceneStrategy<T : Any>() : SceneStrategy<T> {
+
+    @Composable
+    override fun calculateScene(
+        entries: List<NavEntry<T>>,
+        onBack: (Int) -> Unit,
+    ): Scene<T>
+}
 
 /**
  * Remove when [androidx.navigation3:navigation3-ui] will become multiplatform
  */
 expect class DialogSceneStrategy<T : Any>() : SceneStrategy<T> {
 
-     companion object
+    @Composable
+    override fun calculateScene(
+        entries: List<NavEntry<T>>,
+        onBack: (Int) -> Unit,
+    ): Scene<T>?
+
+    companion object
+}
+
+/**
+ * Remove when [androidx.navigation3:navigation3-ui] will become multiplatform
+ */
+expect interface Scene<T : Any> {
+
+    val key: Any
+    val entries: List<NavEntry<T>>
+    val previousEntries: List<NavEntry<T>>
+    val content: @Composable () -> Unit
+}
+
+/**
+ * Remove when [androidx.navigation3:navigation3-ui] will become multiplatform
+ */
+expect interface OverlayScene<T : Any> : Scene<T> {
+
+    val overlaidEntries: List<NavEntry<T>>
 }
 
 /**

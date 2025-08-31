@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,9 +32,11 @@ import androidx.navigation3.runtime.entryProvider
 import com.arttttt.nav3router.Nav3Host
 import com.arttttt.nav3router.Router
 import com.arttttt.nav3router.rememberRouter
-import com.arttttt.nav3router.sample.shared.navigationButtonItem
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class,
+    ExperimentalMaterial3Api::class,
+)
 @Composable
 fun RootContent() {
 
@@ -117,9 +120,17 @@ fun RootContent() {
                     .weight(1f)
                     .border(2.dp, Color.Red),
                 backStack = backStack,
-                sceneStrategy = DialogSceneStrategy(),
+                sceneStrategy = DelegatedScreenStrategy(
+                    strategyMap = mapOf(
+                        "bottomsheet" to BottomSheetSceneStrategy(),
+                        "dialog" to DialogSceneStrategy(),
+                    ),
+                    fallbackStrategy = SinglePaneSceneStrategy(),
+                ),
                 onBack = {
-                    index--
+                    if (backStack.lastOrNull() is Screen.Simple) {
+                        index--
+                    }
                     onBack(it)
                 },
                 entryProvider = entryProvider {
@@ -129,7 +140,9 @@ fun RootContent() {
                         )
                     }
 
-                    entry<Screen.BottomSheet> {
+                    entry<Screen.BottomSheet>(
+                        metadata = BottomSheetSceneStrategy.bottomSheet(),
+                    ) {
                         BottomSheetScreen()
                     }
 

@@ -20,7 +20,45 @@ actual inline fun <reified T : NavKey> rememberNavBackStack(vararg elements: T):
     TODO("Not yet implemented")
 }
 
-actual interface SceneStrategy<T : Any>
+actual interface SceneStrategy<T : Any> {
 
-actual class SinglePaneSceneStrategy<T : Any> : SceneStrategy<T>
-actual class DialogSceneStrategy<T : Any> : SceneStrategy<T>
+    @Composable
+    actual fun calculateScene(
+        entries: List<NavEntry<T>>,
+        onBack: (Int) -> Unit
+    ): Scene<T>?
+}
+
+actual class SinglePaneSceneStrategy<T : Any> : SceneStrategy<T> {
+
+    @Composable
+    actual override fun calculateScene(
+        entries: List<NavEntry<T>>,
+        onBack: (Int) -> Unit,
+    ): Scene<T> {
+        TODO("Not yet implemented")
+    }
+}
+
+actual class DialogSceneStrategy<T : Any> : SceneStrategy<T> {
+
+    actual companion object
+
+    @Composable
+    actual override fun calculateScene(
+        entries: List<NavEntry<T>>,
+        onBack: (Int) -> Unit,
+    ): Scene<T>? {
+        TODO("Not yet implemented")
+    }
+}
+
+actual interface Scene<T : Any> {
+    actual val key: Any
+    actual val entries: List<NavEntry<T>>
+    actual val previousEntries: List<NavEntry<T>>
+    actual val overlaidEntries: List<NavEntry<T>>
+    actual val content: @Composable (() -> Unit)
+}
+
+actual interface OverlayScene<T : Any> : Scene<T>
