@@ -7,3 +7,4 @@ data class ReplaceCurrent<T : Any>(val screen: T) : Command<T>
 data object Pop : Command<Nothing>
 data class PopTo<T : Any>(val screen: T) : Command<T>
 data object ResetToRoot : Command<Nothing>
+data object DropStack : Command<Nothing>

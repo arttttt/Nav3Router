@@ -33,10 +33,7 @@ open class Router<T : Any> : BaseRouter<T>() {
     }
 
     fun dropStack() {
-        executeCommands(
-            ResetToRoot,
-            Pop,
-        )
+        executeCommands(DropStack)
     }
 
     fun popUp() {

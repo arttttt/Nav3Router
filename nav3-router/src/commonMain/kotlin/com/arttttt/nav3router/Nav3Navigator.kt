@@ -20,6 +20,7 @@ class Nav3Navigator(
         commands: Array<out Command<NavKey>>,
     ) {
         val snapshot = navBackStack.toMutableList()
+        var callOnBack = false
 
         for (command in commands) {
             try {
@@ -37,10 +38,7 @@ class Nav3Navigator(
                          * in this case we schedule an [onBack] call and force it to be delayed
                          * by calling [yield]
                          */
-                        mainScope.launch {
-                            yield()
-                            onBack()
-                        }
+                        callOnBack = true
                     },
                 )
             } catch (e: RuntimeException) {
@@ -49,6 +47,10 @@ class Nav3Navigator(
         }
 
         navBackStack.swap(snapshot)
+
+        if (callOnBack) {
+            scheduleOnBack()
+        }
     }
 
     private fun applyCommand(
@@ -75,6 +77,12 @@ class Nav3Navigator(
             is ResetToRoot -> resetToRoot(
                 snapshot = snapshot,
             )
+            is DropStack -> {
+                dropStack(
+                    snapshot = snapshot,
+                )
+                onBackRequested()
+            }
         }
     }
 
@@ -132,6 +140,17 @@ class Nav3Navigator(
 
     private fun resetToRoot(snapshot: MutableList<NavKey>) {
         if (snapshot.size > 1) snapshot.removeRange(1, snapshot.size)
+    }
+
+    private fun dropStack(snapshot: MutableList<NavKey>) {
+        snapshot.removeRange(0, snapshot.size - 1)
+    }
+
+    private fun scheduleOnBack() {
+        mainScope.launch {
+            yield()
+            onBack()
+        }
     }
 
     private fun SnapshotStateList<NavKey>.swap(
