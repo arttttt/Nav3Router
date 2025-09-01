@@ -28,16 +28,6 @@ class Nav3Navigator(
                     snapshot = snapshot,
                     command = command,
                     onBackRequested = {
-                        /**
-                         * [onBack] calls platform code for performing back navigation
-                         * in case we can't pop the backstack anymore
-                         *
-                         * if the stack is not empty before calling [Pop] then
-                         * it might be a problem that [NavDisplay] does not have an updates list
-                         *
-                         * in this case we schedule an [onBack] call and force it to be delayed
-                         * by calling [yield]
-                         */
                         callOnBack = true
                     },
                 )
@@ -146,6 +136,16 @@ class Nav3Navigator(
         snapshot.removeRange(0, snapshot.size - 1)
     }
 
+    /**
+     * [onBack] calls platform code for performing back navigation
+     * in case we can't pop the backstack anymore
+     *
+     * if the stack is not empty before calling [Pop] then
+     * it might be a problem that [NavDisplay] does not have an updates list
+     *
+     * in this case we schedule an [onBack] call and force it to be delayed
+     * by calling [yield]
+     */
     private fun scheduleOnBack() {
         mainScope.launch {
             yield()
