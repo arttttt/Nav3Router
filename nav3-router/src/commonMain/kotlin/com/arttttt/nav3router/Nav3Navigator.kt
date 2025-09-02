@@ -9,12 +9,12 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 
-class Nav3Navigator(
+open class Nav3Navigator(
     private val navBackStack: SnapshotStateList<NavKey>,
     private val onBack: () -> Unit,
 ) : Navigator<NavKey> {
 
-    private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    protected val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun applyCommands(
         commands: Array<out Command<NavKey>>,
@@ -43,7 +43,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun applyCommand(
+    protected open fun applyCommand(
         snapshot: MutableList<NavKey>,
         command: Command<NavKey>,
         onBackRequested: () -> Unit,
@@ -76,14 +76,14 @@ class Nav3Navigator(
         }
     }
 
-    private fun push(
+    protected open fun push(
         snapshot: MutableList<NavKey>,
         command: Push<NavKey>,
     ) {
         snapshot += command.screen
     }
 
-    private fun replace(
+    protected open fun replace(
         snapshot: MutableList<NavKey>,
         command: ReplaceCurrent<NavKey>,
     ) {
@@ -97,7 +97,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun popTo(
+    protected open fun popTo(
         snapshot: MutableList<NavKey>,
         command: PopTo<NavKey>,
     ) {
@@ -116,7 +116,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun pop(
+    protected open fun pop(
         snapshot: MutableList<NavKey>,
     ): Boolean {
         val result = snapshot.size > 1
@@ -128,11 +128,11 @@ class Nav3Navigator(
         return result
     }
 
-    private fun resetToRoot(snapshot: MutableList<NavKey>) {
+    protected open fun resetToRoot(snapshot: MutableList<NavKey>) {
         if (snapshot.size > 1) snapshot.removeRange(1, snapshot.size)
     }
 
-    private fun dropStack(snapshot: MutableList<NavKey>) {
+    protected open fun dropStack(snapshot: MutableList<NavKey>) {
         snapshot.removeRange(0, snapshot.size - 1)
     }
 
@@ -146,14 +146,14 @@ class Nav3Navigator(
      * in this case we schedule an [onBack] call and force it to be delayed
      * by calling [yield]
      */
-    private fun scheduleOnBack() {
+    protected open fun scheduleOnBack() {
         mainScope.launch {
             yield()
             onBack()
         }
     }
 
-    private fun SnapshotStateList<NavKey>.swap(
+    protected fun SnapshotStateList<NavKey>.swap(
         value: List<NavKey>,
     ) {
         Snapshot.withMutableSnapshot {
@@ -162,7 +162,7 @@ class Nav3Navigator(
         }
     }
 
-    private fun MutableList<NavKey>.removeRange(fromIndex: Int, toIndex: Int) {
+    protected fun MutableList<NavKey>.removeRange(fromIndex: Int, toIndex: Int) {
         subList(fromIndex, toIndex).clear()
     }
 }
