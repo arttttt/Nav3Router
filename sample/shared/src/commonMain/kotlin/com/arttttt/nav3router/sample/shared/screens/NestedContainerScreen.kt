@@ -55,7 +55,7 @@ fun NestedContainerScreen() {
 
     val stackManipulationButtons = createStackManipulationButtons(
         onPop = {
-            router.popUp()
+            router.pop()
             index--
         },
         onPush = {
@@ -150,7 +150,7 @@ fun NestedContainerScreen() {
                     ) {
                         DialogScreen(
                             onClick = {
-                                router.popUp()
+                                router.pop()
                             },
                         )
                     }

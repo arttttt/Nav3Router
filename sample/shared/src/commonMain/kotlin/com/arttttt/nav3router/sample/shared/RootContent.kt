@@ -56,7 +56,7 @@ fun RootContent() {
 
     val stackManipulationButtons = createStackManipulationButtons(
         onPop = {
-            router.popUp()
+            router.pop()
             index--
         },
         onPush = {
@@ -152,7 +152,7 @@ fun RootContent() {
                     ) {
                         DialogScreen(
                             onClick = {
-                                router.popUp()
+                                router.pop()
                             },
                         )
                     }

@@ -36,11 +36,11 @@ open class Router<T : Any> : BaseRouter<T>() {
         executeCommands(DropStack)
     }
 
-    fun popUp() {
+    fun pop() {
         executeCommands(Pop)
     }
 
-    fun popUpTo(screen: T) {
+    fun popTo(screen: T) {
         executeCommands(PopTo(screen))
     }
 }

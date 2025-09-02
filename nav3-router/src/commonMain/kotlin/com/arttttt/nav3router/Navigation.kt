@@ -50,7 +50,7 @@ fun <T : NavKey> Nav3Host(
     }
 
     val onBack: (Int) -> Unit = remember(router) {
-        { steps -> repeat(steps) { router.popUp() } }
+        { steps -> repeat(steps) { router.pop() } }
     }
 
     content(backStack, onBack, router)
