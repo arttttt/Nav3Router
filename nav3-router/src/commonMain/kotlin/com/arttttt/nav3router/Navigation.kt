@@ -7,8 +7,14 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation3.runtime.NavKey
 
 /**
- * Remember a Router<T>. By default creates a fresh Router().
- * You can pass keys to recreate on change, or a custom factory.
+ * Creates and remembers a Router instance.
+ *
+ * The router will be recreated if any of the provided keys change, allowing for
+ * state-dependent router configurations.
+ *
+ * @param keys Optional keys that trigger router recreation when changed
+ * @param factory Factory function to create the router instance
+ * @return A remembered router instance
  */
 @Composable
 fun <T : Any> rememberRouter(
@@ -19,8 +25,14 @@ fun <T : Any> rememberRouter(
 }
 
 /**
- * Remember a Nav3Navigator bound to the given backStack.
- * Re-created only if backStack reference changes.
+ * Creates and remembers a Nav3Navigator bound to the given back stack.
+ *
+ * The navigator will be recreated only if the back stack reference or onBack callback changes.
+ * This ensures proper lifecycle management and prevents memory leaks.
+ *
+ * @param backStack The Navigation 3 back stack to control
+ * @param onBack Callback triggered when system back navigation is needed
+ * @return A remembered navigator instance
  */
 @Composable
 fun rememberNav3Navigator(
@@ -30,6 +42,22 @@ fun rememberNav3Navigator(
     return remember(backStack, onBack) { Nav3Navigator(backStack, onBack) }
 }
 
+/**
+ * Main composable for setting up Navigation 3 integration.
+ *
+ * This composable:
+ * 1. Connects the router to the navigator for command execution
+ * 2. Provides proper lifecycle management (setup/cleanup)
+ * 3. Creates a standardized onBack callback for UI components
+ *
+ * The connection between router and navigator is automatically managed through
+ * DisposableEffect, ensuring proper cleanup when the composable leaves the composition.
+ *
+ * @param backStack The Navigation 3 back stack
+ * @param router The router instance for issuing navigation commands
+ * @param navigator The navigator instance for executing commands (auto-created if not provided)
+ * @param content The content composable that receives the navigation setup
+ */
 @Composable
 fun <T : NavKey> Nav3Host(
     backStack: SnapshotStateList<NavKey>,
