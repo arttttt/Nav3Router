@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.KotlinMultiplatform
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -5,6 +6,8 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.vanniktech.mavenPublish)
+    alias(libs.plugins.signing)
 }
 
 kotlin {
@@ -41,4 +44,48 @@ kotlin {
             implementation(libs.ui.backhandler)
         }
     }
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+
+    configure(
+        KotlinMultiplatform(
+            sourcesJar = true,
+            androidVariantsToPublish = listOf("debug", "release"),
+        )
+    )
+
+    coordinates("io.github.arttttt.nav3router", "nav3router", "1.0.0")
+
+    pom {
+        name.set("Nav3 Router")
+        description.set("A simple yet powerful Kotlin Multiplatform navigation library built on top of Jetpack Navigation 3.")
+        inceptionYear.set("2025")
+        url.set("https://github.com/arttttt/Nav3Router")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://github.com/arttttt/Nav3Router/blob/master/LICENSE")
+                distribution.set("https://github.com/arttttt/Nav3Router/blob/master/LICENSE")
+            }
+        }
+        developers {
+            developer {
+                id.set("arttttt")
+                name.set("Artem Bambalov")
+                url.set("https://github.com/arttttt")
+            }
+        }
+        scm {
+            url.set("https://github.com/arttttt/Nav3Router/")
+            connection.set("scm:git:git://github.com/arttttt/Nav3Router.git")
+            developerConnection.set("scm:git:ssh://git@github.com/arttttt/Nav3Router.git")
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
 }
