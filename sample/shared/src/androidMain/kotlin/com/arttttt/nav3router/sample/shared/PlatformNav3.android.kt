@@ -11,7 +11,7 @@ actual fun <T : Any> NavDisplay(
     modifier: Modifier,
     onBack: (Int) -> Unit,
     sceneStrategy: SceneStrategy<T>,
-    entryProvider: (T) -> NavEntry<T>,
+    entryProvider: (key: T) -> NavEntry<T>,
 ) {
     androidx.navigation3.ui.NavDisplay(
         backStack = backStack,

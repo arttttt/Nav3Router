@@ -1,7 +1,6 @@
 package com.arttttt.nav3router.sample.shared
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation3.runtime.NavEntry
@@ -22,7 +21,7 @@ expect fun <T : Any> NavDisplay(
 /**
  * Remove when [androidx.navigation3:navigation3-ui] will become multiplatform
  */
-typealias NavBackStack = SnapshotStateList<NavKey>
+typealias NavBackStack = androidx.navigation3.runtime.NavBackStack<NavKey>
 
 /**
  * Remove when [androidx.navigation3:navigation3-ui] will become multiplatform

@@ -1,7 +1,7 @@
 package com.arttttt.nav3router
 
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +20,7 @@ import kotlinx.coroutines.yield
  * @param onBack Callback to trigger system back navigation when the stack is empty
  */
 open class Nav3Navigator(
-    private val navBackStack: SnapshotStateList<NavKey>,
+    private val navBackStack: NavBackStack<NavKey>,
     private val onBack: () -> Unit,
 ) : Navigator<NavKey> {
 
@@ -228,7 +228,7 @@ open class Nav3Navigator(
      *
      * @param value The new contents for the list
      */
-    protected fun SnapshotStateList<NavKey>.swap(
+    protected fun NavBackStack<NavKey>.swap(
         value: List<NavKey>,
     ) {
         Snapshot.withMutableSnapshot {

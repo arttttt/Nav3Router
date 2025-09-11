@@ -3,7 +3,7 @@ package com.arttttt.nav3router
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 
 /**
@@ -36,7 +36,7 @@ fun <T : Any> rememberRouter(
  */
 @Composable
 fun rememberNav3Navigator(
-    backStack: SnapshotStateList<NavKey>,
+    backStack: NavBackStack<NavKey>,
     onBack: () -> Unit,
 ): Navigator<NavKey> {
     return remember(backStack, onBack) { Nav3Navigator(backStack, onBack) }
@@ -60,14 +60,14 @@ fun rememberNav3Navigator(
  */
 @Composable
 fun <T : NavKey> Nav3Host(
-    backStack: SnapshotStateList<NavKey>,
+    backStack: NavBackStack<NavKey>,
     router: Router<T> = rememberRouter(),
     navigator: Navigator<T> = rememberNav3Navigator(
         backStack = backStack,
         onBack = platformOnBack(),
     ),
     content: @Composable (
-        backStack: SnapshotStateList<NavKey>,
+        backStack: NavBackStack<NavKey>,
         onBack: (Int) -> Unit,
         router: Router<T>,
     ) -> Unit,
