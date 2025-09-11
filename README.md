@@ -46,14 +46,14 @@ Add the dependency to your `build.gradle.kts`:
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("com.arttttt:nav3-router:1.0.0") // Check latest version
+            implementation("io.github.arttttt.nav3router:nav3router:1.0.0") // Check latest version
         }
     }
 }
 
 // For Android-only project
 dependencies {
-    implementation("com.arttttt:nav3-router:1.0.0")
+    implementation("io.github.arttttt.nav3router:nav3router:1.0.0")
 }
 ```
 
