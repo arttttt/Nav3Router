@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import com.arttttt.nav3router.Nav3Host
 import com.arttttt.nav3router.rememberRouter
@@ -130,7 +129,7 @@ fun NestedContainerScreen() {
                     if (backStack.lastOrNull() is Screen.Simple) {
                         index--
                     }
-                    onBack(it)
+                    onBack()
                 },
                 entryProvider = entryProvider {
                     entry<Screen.Simple> { screen ->

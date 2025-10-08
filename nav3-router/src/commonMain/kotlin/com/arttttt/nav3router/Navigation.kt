@@ -68,7 +68,7 @@ fun <T : NavKey> Nav3Host(
     ),
     content: @Composable (
         backStack: NavBackStack<NavKey>,
-        onBack: (Int) -> Unit,
+        onBack: () -> Unit,
         router: Router<T>,
     ) -> Unit,
 ) {
@@ -77,8 +77,8 @@ fun <T : NavKey> Nav3Host(
         onDispose { router.commandQueue.removeNavigator() }
     }
 
-    val onBack: (Int) -> Unit = remember(router) {
-        { steps -> repeat(steps) { router.pop() } }
+    val onBack: () -> Unit = remember(router) {
+        { router.pop() }
     }
 
     content(backStack, onBack, router)

@@ -8,7 +8,7 @@ import androidx.navigation3.runtime.NavKey
 actual fun <T : Any> NavDisplay(
     backStack: List<T>,
     modifier: androidx.compose.ui.Modifier,
-    onBack: (Int) -> Unit,
+    onBack: () -> Unit,
     sceneStrategy: SceneStrategy<T>,
     entryProvider: (T) -> NavEntry<T>,
 ) {
@@ -20,45 +20,38 @@ actual inline fun <reified T : NavKey> rememberNavBackStack(vararg elements: T):
     TODO("Not yet implemented")
 }
 
-actual interface SceneStrategy<T : Any> {
-
-    @Composable
-    actual fun calculateScene(
-        entries: List<NavEntry<T>>,
-        onBack: (Int) -> Unit
-    ): Scene<T>?
-}
-
-actual class SinglePaneSceneStrategy<T : Any> : SceneStrategy<T> {
-
-    @Composable
-    actual override fun calculateScene(
-        entries: List<NavEntry<T>>,
-        onBack: (Int) -> Unit,
-    ): Scene<T> {
-        TODO("Not yet implemented")
-    }
-}
-
-actual class DialogSceneStrategy<T : Any> : SceneStrategy<T> {
-
-    actual companion object
-
-    @Composable
-    actual override fun calculateScene(
-        entries: List<NavEntry<T>>,
-        onBack: (Int) -> Unit,
-    ): Scene<T>? {
-        TODO("Not yet implemented")
-    }
-}
-
 actual interface Scene<T : Any> {
     actual val key: Any
     actual val entries: List<NavEntry<T>>
     actual val previousEntries: List<NavEntry<T>>
-    actual val overlaidEntries: List<NavEntry<T>>
     actual val content: @Composable (() -> Unit)
 }
 
-actual interface OverlayScene<T : Any> : Scene<T>
+actual class SceneStrategyScope<T : Any> {
+    actual val onBack: () -> Unit
+        get() = TODO("Not yet implemented")
+}
+
+actual interface SceneStrategy<T : Any> {
+    actual fun SceneStrategyScope<T>.calculateScene(entries: List<NavEntry<T>>): Scene<T>?
+}
+
+actual class SinglePaneSceneStrategy<T : Any> actual constructor() :
+    SceneStrategy<T> {
+    actual override fun SceneStrategyScope<T>.calculateScene(entries: List<NavEntry<T>>): Scene<T> {
+        TODO("Not yet implemented")
+    }
+}
+
+actual class DialogSceneStrategy<T : Any> actual constructor() :
+    SceneStrategy<T> {
+    actual override fun SceneStrategyScope<T>.calculateScene(entries: List<NavEntry<T>>): Scene<T>? {
+        TODO("Not yet implemented")
+    }
+
+    actual companion object
+}
+
+actual interface OverlayScene<T : Any> : Scene<T> {
+    actual val overlaidEntries: List<NavEntry<T>>
+}

@@ -13,7 +13,7 @@ import androidx.navigation3.runtime.NavKey
 expect fun <T : Any> NavDisplay(
     backStack: List<T>,
     modifier: Modifier,
-    onBack: (Int) -> Unit,
+    onBack: () -> Unit,
     sceneStrategy: SceneStrategy<T> = SinglePaneSceneStrategy(),
     entryProvider: (key: T) -> NavEntry<T>,
 )
@@ -29,13 +29,17 @@ typealias NavBackStack = androidx.navigation3.runtime.NavBackStack<NavKey>
 @Composable
 expect inline fun <reified T : NavKey> rememberNavBackStack(vararg elements: T): NavBackStack
 
+expect class SceneStrategyScope<T : Any> {
+
+    val onBack: () -> Unit
+}
+
 /**
  * Remove when [androidx.navigation3:navigation3-ui] will become multiplatform
  */
 expect interface SceneStrategy<T : Any> {
 
-    @Composable
-    fun calculateScene(entries: List<NavEntry<T>>, onBack: (count: Int) -> Unit): Scene<T>?
+    fun SceneStrategyScope<T>.calculateScene(entries: List<NavEntry<T>>): Scene<T>?
 }
 
 /**
@@ -43,10 +47,8 @@ expect interface SceneStrategy<T : Any> {
  */
 expect class SinglePaneSceneStrategy<T : Any>() : SceneStrategy<T> {
 
-    @Composable
-    override fun calculateScene(
+    override fun SceneStrategyScope<T>.calculateScene(
         entries: List<NavEntry<T>>,
-        onBack: (Int) -> Unit,
     ): Scene<T>
 }
 
@@ -55,10 +57,8 @@ expect class SinglePaneSceneStrategy<T : Any>() : SceneStrategy<T> {
  */
 expect class DialogSceneStrategy<T : Any>() : SceneStrategy<T> {
 
-    @Composable
-    override fun calculateScene(
+    override fun SceneStrategyScope<T>.calculateScene(
         entries: List<NavEntry<T>>,
-        onBack: (Int) -> Unit,
     ): Scene<T>?
 
     companion object

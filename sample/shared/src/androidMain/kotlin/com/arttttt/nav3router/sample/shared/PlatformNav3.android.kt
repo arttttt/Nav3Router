@@ -9,7 +9,7 @@ import androidx.navigation3.runtime.NavKey
 actual fun <T : Any> NavDisplay(
     backStack: List<T>,
     modifier: Modifier,
-    onBack: (Int) -> Unit,
+    onBack: () -> Unit,
     sceneStrategy: SceneStrategy<T>,
     entryProvider: (key: T) -> NavEntry<T>,
 ) {
@@ -27,12 +27,14 @@ actual inline fun <reified T : NavKey> rememberNavBackStack(vararg elements: T):
     return androidx.navigation3.runtime.rememberNavBackStack(*elements)
 }
 
-actual typealias SceneStrategy<T> = androidx.navigation3.ui.SceneStrategy<T>
+actual typealias SceneStrategyScope<T> = androidx.navigation3.scene.SceneStrategyScope<T>
 
-actual typealias SinglePaneSceneStrategy<T> = androidx.navigation3.ui.SinglePaneSceneStrategy<T>
+actual typealias SceneStrategy<T> = androidx.navigation3.scene.SceneStrategy<T>
 
-actual typealias DialogSceneStrategy<T> = androidx.navigation3.ui.DialogSceneStrategy<T>
+actual typealias SinglePaneSceneStrategy<T> = androidx.navigation3.scene.SinglePaneSceneStrategy<T>
 
-actual typealias Scene<T> = androidx.navigation3.ui.Scene<T>
+actual typealias DialogSceneStrategy<T> = androidx.navigation3.scene.DialogSceneStrategy<T>
 
-actual typealias OverlayScene<T> = androidx.navigation3.ui.OverlayScene<T>
+actual typealias Scene<T> = androidx.navigation3.scene.Scene<T>
+
+actual typealias OverlayScene<T> = androidx.navigation3.scene.OverlayScene<T>
