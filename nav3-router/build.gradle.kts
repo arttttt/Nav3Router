@@ -57,7 +57,7 @@ mavenPublishing {
         )
     )
 
-    coordinates("io.github.arttttt.nav3router", "nav3router", "1.0.0")
+    coordinates("io.github.arttttt.nav3router", "nav3router", "1.0.1")
 
     pom {
         name.set("Nav3 Router")
