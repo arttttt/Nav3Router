@@ -1,10 +1,26 @@
 package com.arttttt.nav3router
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+
+/**
+ * CompositionLocal that provides access to the parent Router in nested navigation hierarchies.
+ *
+ * This is used to establish a parent-child relationship between navigation containers.
+ * When a nested Nav3Host is created, it can access its parent router through this CompositionLocal
+ * to properly handle navigation events like pop() and dropStack().
+ *
+ * Value is null for root navigation containers (no parent exists).
+ * Value is non-null for nested navigation containers (parent router available).
+ *
+ * Users typically don't need to access this directly - it's managed automatically by Nav3Host.
+ */
+internal val LocalParentRouter = compositionLocalOf<Router<*>?> { null }
 
 /**
  * Creates and remembers a Router instance.
@@ -64,7 +80,7 @@ fun <T : NavKey> Nav3Host(
     router: Router<T> = rememberRouter(),
     navigator: Navigator<T> = rememberNav3Navigator(
         backStack = backStack,
-        onBack = platformOnBack(),
+        onBack = LocalParentRouter.current?.let { it::pop } ?: platformOnBack(),
     ),
     content: @Composable (
         backStack: NavBackStack<NavKey>,
@@ -81,5 +97,13 @@ fun <T : NavKey> Nav3Host(
         { router.pop() }
     }
 
-    content(backStack, onBack, router)
+    val interceptionEnabled = LocalParentRouter.current != null
+
+    CompositionLocalProvider(LocalParentRouter provides router) {
+        BackInterceptionProvider(
+            interceptionEnabled = interceptionEnabled,
+        ) {
+            content(backStack, onBack, router)
+        }
+    }
 }
