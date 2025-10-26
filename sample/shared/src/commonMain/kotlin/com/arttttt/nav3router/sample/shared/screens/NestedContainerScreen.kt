@@ -18,19 +18,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.navigation3.scene.SinglePaneSceneStrategy
+import androidx.navigation3.ui.NavDisplay
+import androidx.savedstate.serialization.SavedStateConfiguration
 import com.arttttt.nav3router.Nav3Host
 import com.arttttt.nav3router.rememberRouter
 import com.arttttt.nav3router.sample.shared.ButtonsGrid
-import com.arttttt.nav3router.sample.shared.DialogSceneStrategy
-import com.arttttt.nav3router.sample.shared.NavDisplay
 import com.arttttt.nav3router.sample.shared.Screen
-import com.arttttt.nav3router.sample.shared.SinglePaneSceneStrategy
 import com.arttttt.nav3router.sample.shared.createStackManipulationButtons
-import com.arttttt.nav3router.sample.shared.dialog
-import com.arttttt.nav3router.sample.shared.rememberNavBackStack
 import com.arttttt.nav3router.sample.shared.strategies.BottomSheetSceneStrategy
 import com.arttttt.nav3router.sample.shared.strategies.DelegatedScreenStrategy
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +43,19 @@ fun NestedContainerScreen() {
     var index by remember { mutableIntStateOf(0) }
     val router = rememberRouter<Screen>()
 
-    val backStack = rememberNavBackStack(Screen.Simple(0))
+    val backStack = rememberNavBackStack(
+        configuration = SavedStateConfiguration {
+            serializersModule = SerializersModule {
+                polymorphic(NavKey::class) {
+                    subclass(Screen.Simple::class)
+                    subclass(Screen.BottomSheet::class)
+                    subclass(Screen.Dialog::class)
+                    subclass(Screen.NestedContainer::class)
+                }
+            }
+        },
+        Screen.Simple(0),
+    )
 
     val backStackString by derivedStateOf {
         backStack.joinToString(

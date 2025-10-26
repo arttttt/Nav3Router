@@ -41,11 +41,6 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.navigation3.ui)
-        }
         commonMain.dependencies {
             implementation(project(":nav3-router"))
 
@@ -59,6 +54,12 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.jetbrains.androidx.navigation3.ui)
+        }
+
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
         }
     }
 }
