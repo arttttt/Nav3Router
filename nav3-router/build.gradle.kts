@@ -43,6 +43,11 @@ kotlin {
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.ui.backhandler)
         }
+
+        androidMain.dependencies {
+            implementation(libs.androidx.navigationevent.lib)
+            implementation(libs.androidx.navigationevent.compose)
+        }
     }
 }
 
