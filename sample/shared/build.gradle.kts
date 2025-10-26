@@ -37,17 +37,14 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+
+            export(project(":nav3-router"))
         }
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.navigation3.ui)
-        }
         commonMain.dependencies {
-            implementation(project(":nav3-router"))
+            api(project(":nav3-router"))
 
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -59,6 +56,12 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.jetbrains.androidx.navigation3.ui)
+        }
+
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
         }
     }
 }

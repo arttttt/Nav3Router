@@ -4,7 +4,7 @@ A simple yet powerful Kotlin Multiplatform navigation library built on top of [J
 
 ## Features
 
-- **Kotlin Multiplatform Ready** - Share navigation logic between Android and iOS(Nav3 does not fully support iOS yet)
+- **Kotlin Multiplatform Ready** - Share navigation logic between Android and iOS
 - **Type-safe** - Full type safety with Kotlin's type system and `@Serializable`
 - **Decoupled Architecture** - Separate navigation logic from UI for better testability
 - **Command Pattern** - Queue-based system handles timing issues gracefully
