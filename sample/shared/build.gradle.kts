@@ -37,12 +37,14 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+
+            export(project(":nav3-router"))
         }
     }
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":nav3-router"))
+            api(project(":nav3-router"))
 
             implementation(compose.runtime)
             implementation(compose.foundation)
