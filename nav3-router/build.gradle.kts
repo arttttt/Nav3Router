@@ -38,7 +38,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.ui)
+            implementation(libs.compose.ui)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.ui.backhandler)
