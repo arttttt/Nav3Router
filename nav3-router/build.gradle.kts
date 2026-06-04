@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.KotlinMultiplatform
+import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -11,7 +12,7 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "com.arttttt.nav3router"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -38,7 +39,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.ui)
+            implementation(libs.compose.ui)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.ui.backhandler)
@@ -57,8 +58,7 @@ mavenPublishing {
 
     configure(
         KotlinMultiplatform(
-            sourcesJar = true,
-            androidVariantsToPublish = listOf("debug", "release"),
+            sourcesJar = SourcesJar.Sources(),
         )
     )
 

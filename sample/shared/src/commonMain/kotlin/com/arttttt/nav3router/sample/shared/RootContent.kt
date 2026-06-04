@@ -24,7 +24,6 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.arttttt.nav3router.Nav3Host
@@ -34,7 +33,6 @@ import com.arttttt.nav3router.sample.shared.screens.DialogScreen
 import com.arttttt.nav3router.sample.shared.screens.NestedContainerScreen
 import com.arttttt.nav3router.sample.shared.screens.SimpleScreen
 import com.arttttt.nav3router.sample.shared.strategies.BottomSheetSceneStrategy
-import com.arttttt.nav3router.sample.shared.strategies.DelegatedScreenStrategy
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -141,12 +139,9 @@ fun RootContent() {
                         Color.Red
                     ),
                 backStack = backStack,
-                sceneStrategy = DelegatedScreenStrategy(
-                    strategyMap = mapOf(
-                        "bottomsheet" to BottomSheetSceneStrategy(),
-                        "dialog" to DialogSceneStrategy(),
-                    ),
-                    fallbackStrategy = SinglePaneSceneStrategy(),
+                sceneStrategies = listOf(
+                    BottomSheetSceneStrategy(),
+                    DialogSceneStrategy(),
                 ),
                 onBack = {
                     if (backStack.lastOrNull() is Screen.Simple) {
