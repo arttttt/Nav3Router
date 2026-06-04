@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.KotlinMultiplatform
+import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -57,8 +58,7 @@ mavenPublishing {
 
     configure(
         KotlinMultiplatform(
-            sourcesJar = true,
-            androidVariantsToPublish = listOf("debug", "release"),
+            sourcesJar = SourcesJar.Sources(),
         )
     )
 

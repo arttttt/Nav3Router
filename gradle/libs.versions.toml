@@ -15,7 +15,7 @@ nav3 = "1.1.1"
 navigationEvent = "1.1.1"
 jetbrainsNav3 = "1.1.1"
 kotlinSerialization = "1.11.0"
-mavenPublish = "0.35.0"
+mavenPublish = "0.36.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
