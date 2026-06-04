@@ -10,9 +10,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,7 +30,10 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.arttttt.nav3router.Nav3Host
 import com.arttttt.nav3router.rememberRouter
+import com.arttttt.nav3router.result.popWithResult
+import com.arttttt.nav3router.result.registerForResult
 import com.arttttt.nav3router.sample.shared.screens.BottomSheetScreen
+import com.arttttt.nav3router.sample.shared.screens.ColorPickerScreen
 import com.arttttt.nav3router.sample.shared.screens.DialogScreen
 import com.arttttt.nav3router.sample.shared.screens.NestedContainerScreen
 import com.arttttt.nav3router.sample.shared.screens.SimpleScreen
@@ -46,6 +51,7 @@ fun RootContent() {
 
     var index by remember { mutableIntStateOf(0) }
     val router = rememberRouter<Screen>()
+    var pickedColor by remember { mutableStateOf<ColorResult?>(null) }
 
     val backStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -55,6 +61,7 @@ fun RootContent() {
                     subclass(Screen.BottomSheet::class)
                     subclass(Screen.Dialog::class)
                     subclass(Screen.NestedContainer::class)
+                    subclass(Screen.ColorPicker::class)
                 }
             }
         },
@@ -131,6 +138,13 @@ fun RootContent() {
             backStack = backStack,
             router = router,
         ) { backStack, onBack, router ->
+            DisposableEffect(router) {
+                val registration = router.registerForResult<ColorResult>(
+                    onResult = { result -> pickedColor = result },
+                )
+                onDispose { registration.dispose() }
+            }
+
             NavDisplay(
                 modifier = Modifier
                     .weight(1f)
@@ -153,6 +167,10 @@ fun RootContent() {
                     entry<Screen.Simple> { screen ->
                         SimpleScreen(
                             index = screen.index,
+                            pickedColor = pickedColor?.let { Color(it.argb.toInt()) },
+                            onPickColor = {
+                                router.push(Screen.ColorPicker)
+                            },
                         )
                     }
 
@@ -176,6 +194,12 @@ fun RootContent() {
                         clazzContentKey = Screen.NestedContainer::key,
                     ) {
                         NestedContainerScreen()
+                    }
+
+                    entry<Screen.ColorPicker> {
+                        ColorPickerScreen(
+                            onPick = { result -> router.popWithResult(result) },
+                        )
                     }
                 },
             )
