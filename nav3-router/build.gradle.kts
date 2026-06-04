@@ -11,7 +11,7 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "com.arttttt.nav3router"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
 
