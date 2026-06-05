@@ -5,8 +5,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.arttttt.nav3router.result.ResultCoordinator
+import com.arttttt.nav3router.result.ResultStore
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 
 /**
  * CompositionLocal that provides access to the parent Router in nested navigation hierarchies.
@@ -21,6 +28,19 @@ import androidx.navigation3.runtime.NavKey
  * Users typically don't need to access this directly - it's managed automatically by Nav3Host.
  */
 internal val LocalParentRouter = compositionLocalOf<Router<*>?> { null }
+
+private val resultMapSerializer = MapSerializer(String.serializer(), String.serializer())
+
+/**
+ * Persists the [ResultStore] as a single JSON String so pending results survive configuration
+ * change and process death across all KMP targets.
+ */
+private val ResultStoreSaver: Saver<ResultStore, String> = Saver(
+    save = { store -> ResultStore.json.encodeToString(resultMapSerializer, store.snapshot()) },
+    restore = { encoded ->
+        ResultStore.restore(ResultStore.json.decodeFromString(resultMapSerializer, encoded))
+    },
+)
 
 /**
  * Creates and remembers a Router instance.
@@ -91,6 +111,21 @@ fun <T : NavKey> Nav3Host(
     DisposableEffect(router, navigator) {
         router.commandQueue.setNavigator(navigator)
         onDispose { router.commandQueue.removeNavigator() }
+    }
+
+    val resultStore = rememberSaveable(saver = ResultStoreSaver) { ResultStore.empty() }
+    val resultScope = rememberCoroutineScope()
+    val resultCoordinator = remember(resultStore, backStack, resultScope) {
+        ResultCoordinator(
+            store = resultStore,
+            backStack = backStack,
+            scope = resultScope,
+        )
+    }
+
+    DisposableEffect(router, resultCoordinator) {
+        router.resultCoordinator = resultCoordinator
+        onDispose { router.resultCoordinator = null }
     }
 
     val onBack: () -> Unit = remember(router) {

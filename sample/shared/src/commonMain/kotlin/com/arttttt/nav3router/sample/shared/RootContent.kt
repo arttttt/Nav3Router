@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,7 +29,11 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.arttttt.nav3router.Nav3Host
 import com.arttttt.nav3router.rememberRouter
+import com.arttttt.nav3router.result.EphemeralResultApi
+import com.arttttt.nav3router.result.popWithResult
+import com.arttttt.nav3router.result.pushForResult
 import com.arttttt.nav3router.sample.shared.screens.BottomSheetScreen
+import com.arttttt.nav3router.sample.shared.screens.ColorPickerScreen
 import com.arttttt.nav3router.sample.shared.screens.DialogScreen
 import com.arttttt.nav3router.sample.shared.screens.NestedContainerScreen
 import com.arttttt.nav3router.sample.shared.screens.SimpleScreen
@@ -40,12 +45,14 @@ import kotlinx.serialization.modules.subclass
 @OptIn(
     ExperimentalComposeUiApi::class,
     ExperimentalMaterial3Api::class,
+    EphemeralResultApi::class,
 )
 @Composable
 fun RootContent() {
 
     var index by remember { mutableIntStateOf(0) }
     val router = rememberRouter<Screen>()
+    var pickedColor by remember { mutableStateOf<ColorResult?>(null) }
 
     val backStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -55,6 +62,7 @@ fun RootContent() {
                     subclass(Screen.BottomSheet::class)
                     subclass(Screen.Dialog::class)
                     subclass(Screen.NestedContainer::class)
+                    subclass(Screen.ColorPicker::class)
                 }
             }
         },
@@ -153,6 +161,12 @@ fun RootContent() {
                     entry<Screen.Simple> { screen ->
                         SimpleScreen(
                             index = screen.index,
+                            pickedColor = pickedColor?.let { Color(it.argb.toInt()) },
+                            onPickColor = {
+                                router.pushForResult<ColorResult>(Screen.ColorPicker) { color ->
+                                    pickedColor = color
+                                }
+                            },
                         )
                     }
 
@@ -176,6 +190,12 @@ fun RootContent() {
                         clazzContentKey = Screen.NestedContainer::key,
                     ) {
                         NestedContainerScreen()
+                    }
+
+                    entry<Screen.ColorPicker> {
+                        ColorPickerScreen(
+                            onPick = { result -> router.popWithResult(result) },
+                        )
                     }
                 },
             )

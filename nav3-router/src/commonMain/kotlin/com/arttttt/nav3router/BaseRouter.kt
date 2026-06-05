@@ -1,5 +1,7 @@
 package com.arttttt.nav3router
 
+import com.arttttt.nav3router.result.ResultCoordinator
+
 /**
  * Base class for all router implementations.
  *
@@ -17,6 +19,13 @@ abstract class BaseRouter<T : Any> {
      * but accessible to the navigation system for setup.
      */
     internal val commandQueue = CommandQueue<T>()
+
+    /**
+     * Result machinery attached by [Nav3Host]. Null while the router is not hosted (e.g. during a
+     * configuration change before re-attachment). Used by the `sendResult` / `popWithResult` /
+     * `rememberResultChannel` result extensions.
+     */
+    internal var resultCoordinator: ResultCoordinator? = null
 
     /**
      * Executes one or more navigation commands.
