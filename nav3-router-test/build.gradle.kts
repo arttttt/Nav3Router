@@ -1,64 +1,26 @@
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.SourcesJar
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.signing)
 }
 
 kotlin {
     android {
-        namespace = "com.arttttt.nav3router"
+        namespace = "com.arttttt.nav3router.test"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-        packaging {
-            resources {
-                excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            }
-        }
-
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-
-        withHostTest {}
     }
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "Nav3Router"
-            isStatic = true
-        }
-    }
+    iosArm64()
+    iosSimulatorArm64()
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.compose.ui)
-            implementation(libs.kotlinx.coroutines.core)
+            implementation(project(":nav3-router"))
             implementation(libs.androidx.navigation3.runtime)
-            implementation(libs.ui.backhandler)
-            implementation(libs.kotlinx.serialization.core)
-            implementation(libs.kotlinx.serialization.json)
-        }
-
-        androidMain.dependencies {
-            implementation(libs.androidx.navigationevent.lib)
-            implementation(libs.androidx.navigationevent.compose)
-        }
-
-        commonTest.dependencies {
-            implementation(project(":nav3-router-test"))
-            implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }
@@ -73,11 +35,11 @@ mavenPublishing {
         )
     )
 
-    coordinates("io.github.arttttt.nav3router", "nav3router", libs.versions.nav3router.get())
+    coordinates("io.github.arttttt.nav3router", "nav3router-test", libs.versions.nav3router.get())
 
     pom {
-        name.set("Nav3 Router")
-        description.set("A simple yet powerful Kotlin Multiplatform navigation library built on top of Jetpack Navigation 3.")
+        name.set("Nav3 Router Test")
+        description.set("Test-support helpers for Nav3 Router — drive and assert navigation without Compose.")
         inceptionYear.set("2025")
         url.set("https://github.com/arttttt/Nav3Router")
         licenses {
