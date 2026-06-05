@@ -10,8 +10,7 @@ package com.arttttt.nav3router.result
  */
 @RequiresOptIn(
     level = RequiresOptIn.Level.WARNING,
-    message = "Ephemeral result API: survives configuration change in a retained scope, but NOT " +
-        "process death. Use Router.registerForResult for full durability.",
+    message = """Ephemeral result API: survives configuration change in a retained scope, but NOT process death. Use Router.registerForResult for full durability.""",
 )
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.FUNCTION)
