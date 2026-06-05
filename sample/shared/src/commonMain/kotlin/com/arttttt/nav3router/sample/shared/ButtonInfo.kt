@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.arttttt.nav3router.Router
 
 data class ButtonInfo(
     val title: String,
@@ -36,26 +35,20 @@ fun ButtonsGrid(
 }
 
 fun createNavigationButtons(
-    router: Router<Screen>,
+    viewModel: RootViewModel,
 ): List<ButtonInfo> {
     return listOf(
         ButtonInfo(
             title = "show bottom sheet",
-            onClick = {
-                router.push(Screen.BottomSheet)
-            },
+            onClick = viewModel::showBottomSheet,
         ),
         ButtonInfo(
             title = "show dialog",
-            onClick = {
-                router.push(Screen.Dialog)
-            },
+            onClick = viewModel::showDialog,
         ),
         ButtonInfo(
             title = "nested container",
-            onClick = {
-                router.push(Screen.NestedContainer())
-            },
+            onClick = viewModel::openNestedContainer,
         ),
     )
 }
