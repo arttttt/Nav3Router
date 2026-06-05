@@ -31,3 +31,4 @@ rootProject.name = "Navigation3Router"
 include(":sample:android")
 include(":sample:shared")
 include(":nav3-router")
+include(":nav3-router-test")

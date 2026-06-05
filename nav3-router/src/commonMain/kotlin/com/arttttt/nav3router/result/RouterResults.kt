@@ -24,14 +24,14 @@ import kotlinx.serialization.serializer
  * @return a [ResultRegistration]; call [ResultRegistration.dispose] to stop receiving results.
  */
 inline fun <reified R> Router<out NavKey>.registerForResult(
-    noinline onResult: (R) -> Unit,
     noinline onCancelled: () -> Unit = {},
-): ResultRegistration = registerForResult(serializer<R>(), onResult, onCancelled)
+    noinline onResult: (R) -> Unit,
+): ResultRegistration = registerForResult(serializer<R>(), onCancelled, onResult)
 
 fun <R> Router<out NavKey>.registerForResult(
     serializer: KSerializer<R>,
-    onResult: (R) -> Unit,
     onCancelled: () -> Unit = {},
+    onResult: (R) -> Unit,
 ): ResultRegistration {
     val coordinator = resultCoordinator ?: return ResultRegistration {}
     val key = serializer.descriptor.serialName

@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,9 +28,7 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.arttttt.nav3router.Nav3Host
 import com.arttttt.nav3router.rememberRouter
-import com.arttttt.nav3router.result.EphemeralResultApi
 import com.arttttt.nav3router.result.popWithResult
-import com.arttttt.nav3router.result.pushForResult
 import com.arttttt.nav3router.sample.shared.screens.BottomSheetScreen
 import com.arttttt.nav3router.sample.shared.screens.ColorPickerScreen
 import com.arttttt.nav3router.sample.shared.screens.DialogScreen
@@ -45,13 +42,12 @@ import kotlinx.serialization.modules.subclass
 @OptIn(
     ExperimentalComposeUiApi::class,
     ExperimentalMaterial3Api::class,
-    EphemeralResultApi::class,
 )
 @Composable
 fun RootContent() {
 
-    var index by remember { mutableIntStateOf(0) }
     val router = rememberRouter<Screen>()
+    val rootViewModel = remember(router) { RootViewModel(router) }
     var pickedColor by remember { mutableStateOf<ColorResult?>(null) }
 
     val backStack = rememberNavBackStack(
@@ -81,35 +77,16 @@ fun RootContent() {
     }
 
     val stackManipulationButtons = createStackManipulationButtons(
-        onPop = {
-            router.pop()
-            index--
-        },
-        onPush = {
-            router.push(Screen.Simple(++index))
-        },
-        onReplace = {
-            router.replaceCurrent(Screen.Simple(++index))
-        },
-        onNewChain = {
-            router.push(
-                Screen.Simple(++index),
-                Screen.Simple(++index),
-                Screen.Simple(++index),
-            )
-        },
-        onReplaceStack = {
-            router.replaceStack(Screen.Simple(++index))
-        },
-        onClearStack = {
-            router.clearStack()
-        },
-        onDropStack = {
-            router.dropStack()
-        },
+        onPop = rootViewModel::pop,
+        onPush = rootViewModel::push,
+        onReplace = rootViewModel::replace,
+        onNewChain = rootViewModel::pushChain,
+        onReplaceStack = rootViewModel::replaceStack,
+        onClearStack = rootViewModel::clearStack,
+        onDropStack = rootViewModel::dropStack,
     )
 
-    val navigationButtons = createNavigationButtons(router)
+    val navigationButtons = createNavigationButtons(rootViewModel)
 
     Column(
         modifier = Modifier
@@ -152,9 +129,7 @@ fun RootContent() {
                     DialogSceneStrategy(),
                 ),
                 onBack = {
-                    if (backStack.lastOrNull() is Screen.Simple) {
-                        index--
-                    }
+                    rootViewModel.onSystemBack(backStack.lastOrNull())
                     onBack()
                 },
                 entryProvider = entryProvider {
@@ -163,7 +138,7 @@ fun RootContent() {
                             index = screen.index,
                             pickedColor = pickedColor?.let { Color(it.argb.toInt()) },
                             onPickColor = {
-                                router.pushForResult<ColorResult>(Screen.ColorPicker) { color ->
+                                rootViewModel.pickColor { color ->
                                     pickedColor = color
                                 }
                             },
