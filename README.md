@@ -49,12 +49,17 @@ kotlin {
         commonMain.dependencies {
             implementation("io.github.arttttt.nav3router:nav3router:latest") // Check latest version
         }
+        commonTest.dependencies {
+            // Optional: test-support helpers (bindForTest, RecordingNavigator)
+            implementation("io.github.arttttt.nav3router:nav3router-test:latest")
+        }
     }
 }
 
 // For Android-only project
 dependencies {
     implementation("io.github.arttttt.nav3router:nav3router:latest")
+    testImplementation("io.github.arttttt.nav3router:nav3router-test:latest") // optional
 }
 ```
 
@@ -289,7 +294,7 @@ router.resultFlow<SelectedColor>().collect { selected -> /* ... */ }
 |--------|------|-------------|
 | `popWithResult(value)` | producer | Returns `value` to the caller, then pops |
 | `sendResult(value)` | producer | Returns `value` without popping (forwarding) |
-| `registerForResult(onResult, onCancelled)` | consumer | Durable, type-keyed handler; returns a `ResultRegistration` |
+| `registerForResult { result -> }` | consumer | Durable, type-keyed handler; returns a `ResultRegistration` |
 | `pushForResult(screen) { result -> }` | consumer | One-call ergonomic form *(ephemeral)* |
 | `openForResult { screen }` | consumer | `suspend`, returns the result or `null` *(ephemeral)* |
 | `resultFlow()` | consumer | Cold `Flow` of results *(ephemeral)* |
@@ -301,3 +306,60 @@ router.resultFlow<SelectedColor>().collect { selected -> /* ... */ }
   them as distinct result types.
 - `onCancelled` (the screen was dismissed without producing a result) is precise with
   `pushForResult` / `openForResult`; for a long-lived `registerForResult` it is best-effort.
+
+## Testing
+
+The separate `nav3-router-test` artifact lets you drive and assert navigation in plain unit tests —
+no Compose, no `Nav3Host`. Keep navigation logic in a `Router`-driven class (a ViewModel/presenter),
+then bind a real `Router` to a back stack with `bindForTest` and assert the resulting stack.
+
+```kotlin
+class HomeViewModel(private val router: Router<Screen>) {
+    fun openDetails(id: String) = router.push(Screen.Details(id))
+}
+
+@Test
+fun `opens details`() = runTest {
+    // Router commands run on Dispatchers.Main — install a test dispatcher
+    Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+
+    val router = Router<Screen>()
+    val backStack = router.bindForTest(scope = backgroundScope)
+
+    HomeViewModel(router).openDetails("42")
+    advanceUntilIdle()
+
+    // the back stack is a plain observable list — assert it directly
+    assertEquals(Screen.Details("42"), backStack.last())
+
+    Dispatchers.resetMain()
+}
+```
+
+For command-level assertions (which command was emitted, independent of the resulting stack), bind a
+`RecordingNavigator` instead:
+
+```kotlin
+val recorder = RecordingNavigator()
+router.bindForTest(recorder)
+
+viewModel.openDetails("42")
+advanceUntilIdle()
+
+assertEquals(listOf(Push(Screen.Details("42"))), recorder.commands)
+```
+
+To unit-test a screen that **awaits** a result, drive the producer side from the test:
+
+```kotlin
+val router = Router<Screen>()
+router.bindForTest(scope = backgroundScope)
+var picked: Color? = null
+
+viewModel.pickColor { picked = it }          // opens the picker for a result
+advanceUntilIdle()
+router.popWithResult(Color.Red)              // the picker returns
+advanceUntilIdle()
+
+assertEquals(Color.Red, picked)
+```
