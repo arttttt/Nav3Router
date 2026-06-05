@@ -22,6 +22,8 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+
+        withHostTest {}
     }
 
     compilerOptions {
@@ -60,6 +62,12 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+        }
+
+        commonTest.dependencies {
+            implementation(project(":nav3-router-test"))
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }
