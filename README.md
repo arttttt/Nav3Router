@@ -6,6 +6,7 @@ A simple yet powerful Kotlin Multiplatform navigation library built on top of [J
 
 - **Kotlin Multiplatform Ready** - Share navigation logic between Android and iOS
 - **Type-safe** - Full type safety with Kotlin's type system and `@Serializable`
+- **Navigate for Result** - Type-safe results passed back to the caller, durable across configuration change and process death
 - **Decoupled Architecture** - Separate navigation logic from UI for better testability
 - **Command Pattern** - Queue-based system handles timing issues gracefully
 - **Lifecycle-Aware** - Automatic setup/cleanup with proper lifecycle management
@@ -46,14 +47,14 @@ Add the dependency to your `build.gradle.kts`:
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.arttttt.nav3router:nav3router:1.0.0") // Check latest version
+            implementation("io.github.arttttt.nav3router:nav3router:latest") // Check latest version
         }
     }
 }
 
 // For Android-only project
 dependencies {
-    implementation("io.github.arttttt.nav3router:nav3router:1.0.0")
+    implementation("io.github.arttttt.nav3router:nav3router:latest")
 }
 ```
 
@@ -197,3 +198,106 @@ router.clearStack()
 // Make current screen the only one and exit
 router.dropStack()
 ```
+
+## Navigate for Result
+
+Open a screen and get a typed value back. Results are addressed **by their type** and travel through
+a saveable store, so your screens stay clean — no result fields or marker interfaces on any `NavKey`.
+
+The result type just needs to be `@Serializable`:
+
+```kotlin
+@Serializable
+data class SelectedColor(val argb: Long)
+```
+
+### Returning a result (producer)
+
+From the screen that produces the result, call `popWithResult` (return the value and pop) or
+`sendResult` (return it without popping — e.g. a "decider" screen that forwards a result):
+
+```kotlin
+entry<Screen.ColorPicker> {
+    ColorPickerScreen(
+        onPick = { argb -> router.popWithResult(SelectedColor(argb)) },
+    )
+}
+```
+
+### Receiving a result
+
+#### `pushForResult` — one call, ergonomic
+
+Open a screen and handle its result in a single call:
+
+```kotlin
+@OptIn(EphemeralResultApi::class)
+router.pushForResult<SelectedColor>(Screen.ColorPicker) { selected ->
+    // handle the result
+}
+```
+
+> `pushForResult` (and `openForResult` / `resultFlow` below) are marked `@EphemeralResultApi`: the
+> callback/continuation is captured at the call site, so they survive configuration change in a
+> retained scope but **not** process death. For full durability use `registerForResult`.
+
+#### `registerForResult` — the durable core
+
+A plain `Router` method that registers a typed handler and returns a `ResultRegistration` to
+dispose. Invoke it from somewhere that re-runs on recreation (a `ViewModel`, or a
+`DisposableEffect`); it re-attaches to the saveable store, so a pending result survives
+**configuration change and process death** — no callback is ever serialized:
+
+```kotlin
+class HomeViewModel(
+    private val router: Router<Screen>,
+) : ViewModel() {
+
+    private val pickColor = router.registerForResult<SelectedColor>(
+        onResult = { selected -> /* ... */ },
+        onCancelled = { /* screen left without a result */ },
+    )
+
+    fun pickColor() = router.push(Screen.ColorPicker)
+
+    override fun onCleared() = pickColor.dispose()
+}
+```
+
+In Compose:
+
+```kotlin
+DisposableEffect(router) {
+    val registration = router.registerForResult<SelectedColor> { selected -> /* ... */ }
+    onDispose { registration.dispose() }
+}
+```
+
+#### `openForResult` / `resultFlow` — suspend & Flow sugar
+
+```kotlin
+@OptIn(EphemeralResultApi::class)
+val selected: SelectedColor? = router.openForResult { Screen.ColorPicker } // suspends until result or cancel
+
+@OptIn(EphemeralResultApi::class)
+router.resultFlow<SelectedColor>().collect { selected -> /* ... */ }
+```
+
+### Result API
+
+| Method | Side | Description |
+|--------|------|-------------|
+| `popWithResult(value)` | producer | Returns `value` to the caller, then pops |
+| `sendResult(value)` | producer | Returns `value` without popping (forwarding) |
+| `registerForResult(onResult, onCancelled)` | consumer | Durable, type-keyed handler; returns a `ResultRegistration` |
+| `pushForResult(screen) { result -> }` | consumer | One-call ergonomic form *(ephemeral)* |
+| `openForResult { screen }` | consumer | `suspend`, returns the result or `null` *(ephemeral)* |
+| `resultFlow()` | consumer | Cold `Flow` of results *(ephemeral)* |
+
+### Notes
+
+- Results are keyed **by type**, so a screen registers one handler per result type. Sequential opens
+  of the same type work fine; to await two requests of the **same** type at the same time, model
+  them as distinct result types.
+- `onCancelled` (the screen was dismissed without producing a result) is precise with
+  `pushForResult` / `openForResult`; for a long-lived `registerForResult` it is best-effort.
